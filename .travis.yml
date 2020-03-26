@@ -3,18 +3,20 @@
 language: rust
 
 before_install:
-    - rustup component add rustfmt
-    - rustup component add clippy
+  - rustup component add rustfmt
+  - rustup component add clippy
 
 script:
-    - cargo fmt --verbose
-    - cargo clippy --verbose
-    - cargo build --verbose --all
-    - cargo test --verbose --all 
+  - cargo fmt --verbose
+  - cargo clippy --verbose
+  - cargo build --verbose --all
+  - cargo test --verbose --all 
 
 rust:
   - stable
   - beta
   - nightly
 jobs:
+  allow_failures:
+    - rust: nightly
   fast_finish: true
