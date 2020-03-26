@@ -1,4 +1,4 @@
-use serde::{Deserialize};
+use serde::Deserialize;
 use std::env;
 use url::form_urlencoded::byte_serialize;
 
@@ -7,21 +7,19 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     // Parse CLI arguments
     let vejnavn = if let Some(cli_vejnavn) = env::args().nth(1) {
         cli_vejnavn
-    }
-    else {
+    } else {
         "Rentemestervej".to_string()
     };
 
     let husnr = if let Some(cli_husnr) = env::args().nth(2) {
         cli_husnr
-    }
-    else {
+    } else {
         "8".to_string()
     };
 
     // Construct request
-    let request_url = format!{"https://dawa.aws.dk/adresser?vejnavn={}&husnr={}&struktur=mini", 
-        url_enc(&vejnavn), husnr};
+    let request_url = format! {"https://dawa.aws.dk/adresser?vejnavn={}&husnr={}&struktur=mini",
+    url_enc(&vejnavn), husnr};
 
     // Request to DAWA
     let addresses = reqwest::get(&request_url)
@@ -31,7 +29,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     // adress.betegnelse is human friendly
     for address in addresses.iter() {
-        println!{"{}", address.betegnelse};
+        println! {"{}", address.betegnelse};
     }
 
     Ok(())
