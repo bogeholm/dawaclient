@@ -1,6 +1,5 @@
 use serde::Deserialize;
 use std::env;
-use url::form_urlencoded::byte_serialize;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -18,8 +17,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     };
 
     // Construct request
-    let request_url = format! {"https://dawa.aws.dk/adresser?vejnavn={}&husnr={}&struktur=mini",
-    url_enc(&vejnavn), husnr};
+    let request_url =
+        format! {"https://dawa.aws.dk/adresser?vejnavn={}&husnr={}&struktur=mini", vejnavn, husnr};
 
     // Request to DAWA
     let addresses = reqwest::get(&request_url)
@@ -33,11 +32,6 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     }
 
     Ok(())
-}
-
-/// URL encode an `&str`
-fn url_enc(string: &str) -> String {
-    byte_serialize(string.as_bytes()).collect()
 }
 
 /// Dawa address struct
