@@ -1,5 +1,5 @@
 [package]
-name = "dawa"
+name = "dawaclient"
 version = "0.1.0"
 authors = ["bogeholm <troelsmikkelsen@gmail.com>"]
 edition = "2018"

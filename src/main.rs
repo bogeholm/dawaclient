@@ -19,37 +19,32 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         "8".to_string()
     };
 
-    
-    //let txt = reqwest::get("https://dawa.aws.dk/adresser?vejnavn=Rentemestervej&husnr=8&etage=st&struktur=mini") // one
-    let txt = reqwest::get("https://dawa.aws.dk/adresser?vejnavn=Rentemestervej&husnr=8&struktur=mini") // multiple
+    // Construct request
+    let request_url = format!{"https://dawa.aws.dk/adresser?vejnavn={}&husnr={}&struktur=mini", 
+        url_enc(&vejnavn), husnr};
+
+    // Request to DAWA
+    let addresses = reqwest::get(&request_url)
         .await?
         .json::<Vec<DawaAdresse>>()
         .await?;
 
-    for x in txt.iter() {
-        println!{"{:#?}", x};
+    // adress.betegnelse is human friendly
+    for address in addresses.iter() {
+        println!{"{}", address.betegnelse};
     }
-    
-    let s_1 = "abc";
-    let s_2 = "æø å";
-    
-    println!{"{}", &s_1};
-    println!{"{}", &s_2};
 
-    let url_1: String = byte_serialize(&s_1.as_bytes()).collect();
-    let url_2: String = byte_serialize(&s_2.as_bytes()).collect();
-    
-    println!{"{:#?}", url_1};
-    println!{"{:#?}", url_2};
-
-
-
-    
     Ok(())
+}
+
+/// URL encode an `&str`
+fn url_enc(string: &str) -> String {
+    byte_serialize(string.as_bytes()).collect()
 }
 
 /// Dawa address struct
 /// https://dawa.aws.dk/adresser?vejnavn=Rentemestervej&husnr=8&etage=st&struktur=mini
+/// ```javascript
 /// [
 ///     {
 ///     "id": "0a3f50a0-4660-32b8-e044-0003ba298018",
@@ -74,9 +69,11 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 ///     "betegnelse": "Rentemestervej 8, st., 2400 København NV"
 ///   }
 /// ]
+/// ```
 #[derive(Deserialize, Debug)]
+#[non_exhaustive]
 pub struct DawaAdresse {
-    id: String, // UUID
+    id: String, // GUID
     status: u8,
     darstatus: u8,
     vejkode: String,
@@ -84,14 +81,15 @@ pub struct DawaAdresse {
     adresseringsvejnavn: String,
     husnr: String,
     etage: Option<String>,
-    //dør: Option<String>, // Non-ASCII
+    #[serde(rename = "dør")] // Non-ASCII
+    doer: Option<String>,
     supplerendebynavn: Option<String>,
     postnr: String,
     postnrnavn: String,
     stormodtagerpostnr: Option<i32>,
     stormodtagerpostnrnavn: Option<String>,
     kommunekode: String,
-    adgangsadresseid: String, // UUID
+    adgangsadresseid: String, // GUID
     x: f64,
     y: f64,
     href: String,
