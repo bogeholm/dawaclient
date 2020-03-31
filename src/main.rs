@@ -1,32 +1,27 @@
+use http::status::StatusCode;
 use serde::Deserialize;
-use std::env;
+use std::{env, error::Error};
+
+const USAGE: &str = "Usage: `dawaclient <street name> <house number>`";
 
 #[tokio::main]
-async fn main() -> Result<(), Box<dyn std::error::Error>> {
+async fn main() -> Result<(), Box<dyn Error>> {
     // Parse CLI arguments
-    let vejnavn = if let Some(cli_vejnavn) = env::args().nth(1) {
-        cli_vejnavn
-    } else {
-        "Rentemestervej".to_string()
-    };
-
-    let husnr = if let Some(cli_husnr) = env::args().nth(2) {
-        cli_husnr
-    } else {
-        "8".to_string()
-    };
+    let cli_args = parse_cli()?;
 
     // Construct request
-    let request_url =
-        format! {"https://dawa.aws.dk/adresser?vejnavn={}&husnr={}&struktur=mini", vejnavn, husnr};
+    let request_url = format! {"https://dawa.aws.dk/adresser?vejnavn={}&husnr={}&struktur=mini",
+    cli_args.street_name, cli_args.house_number};
+    println! {"Sending request to {}", &request_url};
 
     // Request to DAWA
-    let addresses = reqwest::get(&request_url)
-        .await?
-        .json::<Vec<DawaAdresse>>()
-        .await?;
+    let response = reqwest::get(&request_url).await?;
 
-    // adress.betegnelse is human friendly
+    // Parse response
+    let addresses = parse_response(response).await?;
+
+    // `betegnelse` is human friendly
+    println! {"Found {} address(es)\n", addresses.len()};
     for address in addresses.iter() {
         println! {"{}", address.betegnelse};
     }
@@ -34,8 +29,61 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     Ok(())
 }
 
-/// Dawa address struct
-/// https://dawa.aws.dk/adresser?vejnavn=Rentemestervej&husnr=8&etage=st&struktur=mini
+/// Consume the web response and parse as a Vec of DawaAddresses (which may be empty) on 200 OK,
+/// or else return the error from DAWA.
+async fn parse_response(response: reqwest::Response) -> Result<Vec<DawaAddress>, Box<dyn Error>> {
+    let status = response.status();
+    let body = response.text().await?;
+
+    match status {
+        StatusCode::OK => {
+            let addresses: Vec<DawaAddress> = serde_json::from_str(&body)?;
+            Ok(addresses)
+        }
+        _ => Err(Box::new(DawaError(body))),
+    }
+}
+
+/// Expected CLI arguments are street name and house number
+fn parse_cli() -> Result<CliArgs, DawaError> {
+    let street_name = if let Some(cli_street_name) = env::args().nth(1) {
+        cli_street_name
+    } else {
+        return Err(DawaError(USAGE.into()));
+    };
+
+    let house_number = if let Some(cli_house_number) = env::args().nth(2) {
+        cli_house_number
+    } else {
+        return Err(DawaError(USAGE.into()));
+    };
+
+    Ok(CliArgs {
+        street_name,
+        house_number,
+    })
+}
+
+#[derive(Debug)]
+#[non_exhaustive]
+pub struct CliArgs {
+    street_name: String,
+    house_number: String,
+}
+
+/// Generic custom error type.
+#[derive(Debug)]
+struct DawaError(String);
+
+impl std::fmt::Display for DawaError {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        write!(f, "Error: {}", self.0)
+    }
+}
+
+impl Error for DawaError {}
+
+/// Dawa address struct. Example: [https://dawa.aws.dk/adresser?street_name=Rentemestervej&house_number=8&etage=st&struktur=mini](https://dawa.aws.dk/adresser?street_name=Rentemestervej&house_number=8&etage=st&struktur=mini)
 /// ```javascript
 /// [
 ///     {
@@ -44,7 +92,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 ///     "darstatus": 3,
 ///     "vejkode": "5804",
 ///     "vejnavn": "Rentemestervej",
-///     "adresseringsvejnavn": "Rentemestervej",
+///     "adresseringsstreet_name": "Rentemestervej",
 ///     "husnr": "8",
 ///     "etage": "st",
 ///     "dør": null,
@@ -64,7 +112,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 /// ```
 #[derive(Deserialize, Debug)]
 #[non_exhaustive]
-pub struct DawaAdresse {
+pub struct DawaAddress {
     id: String, // GUID
     status: u8,
     darstatus: u8,
