@@ -83,7 +83,7 @@ impl std::fmt::Display for DawaError {
 
 impl Error for DawaError {}
 
-/// Dawa address struct. Example: [https://dawa.aws.dk/adresser?street_name=Rentemestervej&house_number=8&etage=st&struktur=mini](https://dawa.aws.dk/adresser?street_name=Rentemestervej&house_number=8&etage=st&struktur=mini)
+/// Dawa address struct. Example: [https://dawa.aws.dk/adresser?vejnavn=Rentemestervej&husnr=8&etage=st&struktur=mini](https://dawa.aws.dk/adresser?vejnavn=Rentemestervej&husnr=8&etage=st&struktur=mini)
 /// ```javascript
 /// [
 ///     {
