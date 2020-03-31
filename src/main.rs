@@ -92,7 +92,7 @@ impl Error for DawaError {}
 ///     "darstatus": 3,
 ///     "vejkode": "5804",
 ///     "vejnavn": "Rentemestervej",
-///     "adresseringsstreet_name": "Rentemestervej",
+///     "adresseringsvejnavn": "Rentemestervej",
 ///     "husnr": "8",
 ///     "etage": "st",
 ///     "dør": null,
