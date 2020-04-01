@@ -20,3 +20,25 @@ jobs:
   allow_failures:
     - rust: nightly
   fast_finish: true
+
+# https://docs.travis-ci.com/user/deployment/pages/
+# https://docs.travis-ci.com/user/build-stages/matrix-expansion/
+# https://docs.travis-ci.com/user/build-stages/deploy-github-releases/
+jobs:
+  include:
+    - stage: GitHub Pages
+      script:
+        - cargo doc --no-deps
+        - rm -rf public/
+        - mkdir -p public/
+        - mv target/doc* public/
+        - touch public/.nojekyll
+      deploy:
+        provider: pages
+        skip_cleanup: true
+        github_token: $GITHUB_TOKEN  # Set in the settings page of your repository, as a secure variable
+        target_branch: gh-pages
+        local_dir: public
+        verbose: true
+        on: 
+          branch: master
