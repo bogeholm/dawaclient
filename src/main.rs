@@ -4,6 +4,12 @@ use std::{env, error::Error};
 
 const USAGE: &str = "Usage: `dawaclient <street name> <house number>`";
 
+/// Parses CLI arguments, send a request to [DAWA](https://dawa.aws.dk/) and prints the results. The
+/// expected CLI args are `street name` and `house number`:
+///```bash
+/// dawaclient <street name> <house number>
+/// ```
+/// Any matching adresses are printed to `stdout`, any errors are returned as well.
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn Error>> {
     // Parse CLI arguments
@@ -30,8 +36,10 @@ async fn main() -> Result<(), Box<dyn Error>> {
     Ok(())
 }
 
-/// Consume the web response and parse as a Vec of DawaAddresses (which may be empty) on 200 OK,
-/// or else return the error from DAWA.
+/// Consume the [`reqwest::Response`](https://docs.rs/reqwest/0.10.4/reqwest/struct.Response.html)
+/// and parse as a Vec of DawaAddresses (which may be empty) on 200 OK, or else return any errors.
+/// Note that [DAWA's errors are structured](https://dawa.aws.dk/dok/api/generelt#fejlhaandtering),
+/// so any error could potentially be parsed and handled case by case.
 async fn parse_response(response: reqwest::Response) -> Result<Vec<DawaAddress>, Box<dyn Error>> {
     let status = response.status();
     let body = response.text().await?;
@@ -45,7 +53,7 @@ async fn parse_response(response: reqwest::Response) -> Result<Vec<DawaAddress>,
     }
 }
 
-/// Expected CLI arguments are street name and house number
+/// Parse CLI arguments. `street name` and `house number` are expected, in that order.
 fn parse_cli() -> Result<CliArgs, DawaError> {
     let street_name = if let Some(cli_street_name) = env::args().nth(1) {
         cli_street_name
@@ -65,6 +73,7 @@ fn parse_cli() -> Result<CliArgs, DawaError> {
     })
 }
 
+/// Captures the CLI arguments `street name` and `house number`.
 #[derive(Debug)]
 #[non_exhaustive]
 pub struct CliArgs {
@@ -72,7 +81,7 @@ pub struct CliArgs {
     house_number: String,
 }
 
-/// Generic custom error type.
+/// Minimal generic custom error type that wraps [`std::string::String`](https://doc.rust-lang.org/std/string/struct.String.html)
 #[derive(Debug)]
 struct DawaError(String);
 
@@ -84,7 +93,8 @@ impl std::fmt::Display for DawaError {
 
 impl Error for DawaError {}
 
-/// Dawa address struct. Example: [https://dawa.aws.dk/adresser?vejnavn=Rentemestervej&husnr=8&etage=st&struktur=mini](https://dawa.aws.dk/adresser?vejnavn=Rentemestervej&husnr=8&etage=st&struktur=mini)
+/// Dawa ['mini'](https://dawa.aws.dk/dok/api/generelt#fladognestede) address struct.
+/// Example: [https://dawa.aws.dk/adresser?vejnavn=Rentemestervej&husnr=8&etage=st&struktur=mini](https://dawa.aws.dk/adresser?vejnavn=Rentemestervej&husnr=8&etage=st&struktur=mini)
 /// ```javascript
 /// [
 ///     {
@@ -111,12 +121,13 @@ impl Error for DawaError {}
 ///   }
 /// ]
 /// ```
+/// Types are based on cursory inspection of a handful of responses.
 #[derive(Deserialize, Debug)]
 #[non_exhaustive]
 pub struct DawaAddress {
     id: String, // GUID
-    status: u8,
-    darstatus: u8,
+    status: u16,
+    darstatus: u16,
     vejkode: String,
     vejnavn: String,
     adresseringsvejnavn: String,
