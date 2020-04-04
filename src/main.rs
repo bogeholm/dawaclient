@@ -1,6 +1,7 @@
 use http::status::StatusCode;
 use serde::Deserialize;
 use std::{env, error::Error};
+use uuid::Uuid;
 
 const USAGE: &str = "Usage: `dawaclient <street name> <house number>`";
 
@@ -125,7 +126,7 @@ impl Error for DawaError {}
 #[derive(Deserialize, Debug)]
 #[non_exhaustive]
 pub struct DawaAddress {
-    id: String, // GUID
+    id: Uuid,
     status: u16,
     darstatus: u16,
     vejkode: String,
@@ -141,7 +142,7 @@ pub struct DawaAddress {
     stormodtagerpostnr: Option<i32>,
     stormodtagerpostnrnavn: Option<String>,
     kommunekode: String,
-    adgangsadresseid: String, // GUID
+    adgangsadresseid: Uuid,
     x: f64,
     y: f64,
     href: String,
