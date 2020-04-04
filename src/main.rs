@@ -12,10 +12,11 @@ async fn main() -> Result<(), Box<dyn Error>> {
     // Construct request
     let request_url = format! {"https://dawa.aws.dk/adresser?vejnavn={}&husnr={}&struktur=mini",
     cli_args.street_name, cli_args.house_number};
-    println! {"Sending request to {}", &request_url};
 
     // Request to DAWA
+    println! {"Sending request to {}", &request_url};
     let response = reqwest::get(&request_url).await?;
+    println! {"HTTP status: {}", response.status()};
 
     // Parse response
     let addresses = parse_response(response).await?;
