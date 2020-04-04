@@ -26,3 +26,12 @@ $ cargo build --release
 $ cd target/release
 $ ./dawaclient Vestergade 1
 ``` 
+
+### Docker
+[Mere info](https://hub.docker.com/_/rust)
+
+```bash
+$ docker build --tag dawars --file Docker/Dockerfile.run .
+$ docker run -it --rm dawars
+$ dawaclient Vestergade 1
+```
