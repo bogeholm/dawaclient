@@ -20,7 +20,7 @@ $ cargo doc --no-deps --open
 $ cargo run -- Vestergade 1
 ``` 
 
-#### Compile med optimering og kør
+#### Compile med optimeringer
 ```bash
 $ cargo build --release
 $ cd target/release
@@ -28,10 +28,10 @@ $ ./dawaclient Vestergade 1
 ``` 
 
 ### Docker
-[Mere info](https://hub.docker.com/_/rust)
+Se for eksempel [Rust - Docker Official Images](https://hub.docker.com/_/rust)
 
-```bash
-$ docker build --tag dawars --file Docker/Dockerfile.run .
+```shell
+$ docker build --tag dawars --file Docker/Dockerfile .
 $ docker run -it --rm dawars
-$ dawaclient Vestergade 1
+root@<container ID>:/# dawaclient Vestergade 1
 ```

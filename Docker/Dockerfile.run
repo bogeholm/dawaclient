@@ -1,4 +1,0 @@
-FROM rust:latest 
-WORKDIR /usr/src/dawaclient
-COPY . .
-RUN cargo install --path .
