@@ -141,7 +141,7 @@ pub struct DawaAddress {
     supplerendebynavn: Option<String>,
     postnr: String,
     postnrnavn: String,
-    stormodtagerpostnr: Option<i32>,
+    stormodtagerpostnr: Option<String>,
     stormodtagerpostnrnavn: Option<String>,
     kommunekode: String,
     adgangsadresseid: Uuid,
