@@ -33,4 +33,4 @@ $ docker build --tag dawars --file Docker/Dockerfile .
 $ docker run -it --rm dawars
 root@<container ID>:/# dawaclient Vestergade 1
 ```
-[Dokumenation for Rust & Docker](https://hub.docker.com/_/rust)
+Se [dockerhub/rust](https://hub.docker.com/_/rust)
