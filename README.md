@@ -28,10 +28,9 @@ $ ./dawaclient Vestergade 1
 ``` 
 
 ### Docker
-Se for eksempel [Rust - Docker Official Images](https://hub.docker.com/_/rust)
-
 ```shell
 $ docker build --tag dawars --file Docker/Dockerfile .
 $ docker run -it --rm dawars
 root@<container ID>:/# dawaclient Vestergade 1
 ```
+[Dokumenation for Rust & Docker](https://hub.docker.com/_/rust)
