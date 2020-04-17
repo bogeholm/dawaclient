@@ -1,5 +1,4 @@
 FROM rust:latest AS builder
-#WORKDIR /usr/src/dawaclient/
 WORKDIR /app/
 # See .dockerignore
 COPY . .
