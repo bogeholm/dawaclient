@@ -15,7 +15,7 @@ $ cd dawaclient
 $ cargo doc --no-deps --open
 ```
 
-#### Quickstart
+#### [Quick](https://blog.mozilla.org/nnethercote/2019/10/11/how-to-speed-up-the-rust-compiler-some-more-in-2019/)start
 ```bash
 $ cargo run -- Vestergade 1
 ``` 
