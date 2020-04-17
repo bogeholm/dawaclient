@@ -1,5 +1,6 @@
 FROM rust:latest AS builder
-WORKDIR /usr/src/dawaclient/
+#WORKDIR /usr/src/dawaclient/
+WORKDIR /app/
 # See .dockerignore
 COPY . .
 RUN cargo build --release
@@ -11,4 +12,4 @@ RUN apt-get update \
     ca-certificates \
     libssl-dev \
     && rm -rf /var/lib/apt/lists/*
-COPY --from=builder /usr/src/dawaclient/target/release/dawaclient /usr/local/bin/dawaclient
+COPY --from=builder /app/target/release/dawaclient /usr/local/bin/dawaclient
