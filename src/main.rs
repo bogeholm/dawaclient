@@ -5,7 +5,7 @@ use uuid::Uuid;
 
 const USAGE: &str = "Usage: `dawaclient <street name> <house number>`";
 
-/// Parses CLI arguments, send a request to [DAWA](https://dawa.aws.dk/) and prints the results. The
+/// Parses CLI arguments, sends a request to [DAWA](https://dawa.aws.dk/) and prints the results. The
 /// expected CLI args are `street name` and `house number`:
 ///```bash
 /// dawaclient <street name> <house number>
@@ -79,7 +79,7 @@ fn parse_cli() -> Result<CliArgs, DawaError> {
 /// Captures the CLI arguments `street name` and `house number`.
 #[derive(Debug)]
 #[non_exhaustive]
-pub struct CliArgs {
+struct CliArgs {
     street_name: String,
     house_number: String,
 }
@@ -127,7 +127,7 @@ impl Error for DawaError {}
 /// Types are based on cursory inspection of a handful of responses.
 #[derive(Deserialize, Debug)]
 #[non_exhaustive]
-pub struct DawaAddress {
+struct DawaAddress {
     id: Uuid,
     status: u16,
     darstatus: u16,
